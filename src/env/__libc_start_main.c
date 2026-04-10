@@ -38,6 +38,9 @@ void __init_libc(char **envp, char *pn)
 
 	__init_tls(aux);
 	__init_ssp((void *)aux[AT_RANDOM]);
+#if defined (__riscv) && __riscv_xlen == 64
+	__init_riscv_string_optimizations();
+#endif
 
 	if (aux[AT_UID]==aux[AT_EUID] && aux[AT_GID]==aux[AT_EGID]
 		&& !aux[AT_SECURE]) return;

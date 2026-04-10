@@ -40,6 +40,9 @@ extern hidden struct __libc __libc;
 hidden void __init_libc(char **, char *);
 hidden void __init_tls(size_t *);
 hidden void __init_ssp(void *);
+#if defined (__riscv) && __riscv_xlen == 64
+hidden void __init_riscv_string_optimizations(void);
+#endif
 hidden void __libc_start_init(void);
 hidden void __funcs_on_exit(void);
 hidden void __funcs_on_quick_exit(void);

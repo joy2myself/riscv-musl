@@ -6,6 +6,8 @@ void *__memset_scalar(void *s, int c, size_t n);
 void *__memset_vect(void *s, int c, size_t n);
 void *__memcpy_scalar(void *restrict dest, const void *restrict src, size_t n);
 void *__memcpy_vect(void *restrict dest, const void *restrict src, size_t n);
+void *__mempcpy_scalar(void *dest, const void *src, size_t n);
+void *__mempcpy_vect(void *dest, const void *src, size_t n);
 void *__memmove_scalar(void *restrict dest, const void *restrict src, size_t n);
 void *__memmove_vect(void *restrict dest, const void *restrict src, size_t n);
 void *__memccpy_scalar(void *restrict dest, const void *restrict src, int c, size_t n);
@@ -38,6 +40,7 @@ char *__strcpy_vect(char *dest, const char *src);
 #ifndef __riscv_vector
 static void *(*__memset_ptr)(void *, int, size_t) = __memset_scalar;
 static void *(*__memcpy_ptr)(void *, const void *, size_t) = __memcpy_scalar;
+static void *(*__mempcpy_ptr)(void *, const void *, size_t) = __mempcpy_scalar;
 static void *(*__memmove_ptr)(void *, const void *, size_t) = __memmove_scalar;
 static void *(*__memccpy_ptr)(void *, const void *, int, size_t) = __memccpy_scalar;
 static void *(*__memchr_ptr)(const void *, int, size_t) = __memchr_scalar;
@@ -55,6 +58,7 @@ static char *(*__strcpy_ptr)(char *, const char *) = __strcpy_scalar;
 #else
 static void *(*__memset_ptr)(void *, int, size_t) = __memset_vect;
 static void *(*__memcpy_ptr)(void *, const void *, size_t) = __memcpy_vect;
+static void *(*__mempcpy_ptr)(void *, const void *, size_t) = __mempcpy_vect;
 static void *(*__memmove_ptr)(void *, const void *, size_t) = __memmove_vect;
 static void *(*__memccpy_ptr)(void *, const void *, int, size_t) = __memccpy_vect;
 static void *(*__memchr_ptr)(const void *, int, size_t) = __memchr_vect;
@@ -79,6 +83,11 @@ void *memset(void *s, int c, size_t n)
 void *memcpy(void *restrict dest, const void *restrict src, size_t n)
 {
 	return __memcpy_ptr(dest, src, n);
+}
+
+void *mempcpy(void *dest, const void *src, size_t n)
+{
+	return __mempcpy_ptr(dest, src, n);
 }
 
 void *memmove(void *dest, const void *src, size_t n)
@@ -158,6 +167,7 @@ hidden void __init_riscv_string_optimizations(void)
 	if (__has_rvv_via_hwcap()) {
 		__memset_ptr = __memset_vect;
 		__memcpy_ptr = __memcpy_vect;
+		__mempcpy_ptr = __mempcpy_vect;
 		__memmove_ptr = __memmove_vect;
 		__memccpy_ptr = __memccpy_vect;
 		__memchr_ptr = __memchr_vect;

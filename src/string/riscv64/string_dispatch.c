@@ -55,7 +55,7 @@ int __strncasecmp_scalar(const char *a, const char *b, size_t n);
 int __strncasecmp_vect(const char *a, const char *b, size_t n);
 
 /* string function pointer, runtime-dispatched based on RVV support */
-#ifndef __riscv_vector
+#if defined(MUSL_BENCH_FORCE_SCALAR) || !defined(__riscv_vector)
 static void *(*__memset_ptr)(void *, int, size_t) = __memset_scalar;
 static void *(*__memcpy_ptr)(void *, const void *, size_t) = __memcpy_scalar;
 static void *(*__mempcpy_ptr)(void *, const void *, size_t) = __mempcpy_scalar;
@@ -245,6 +245,10 @@ static inline int __has_rvv_via_hwcap(void)
 
 hidden void __init_riscv_string_optimizations(void)
 {
+#ifdef MUSL_BENCH_FORCE_SCALAR
+	/* Test-only scalar baseline: do not enable RVV from HWCAP. */
+	return;
+#endif
 	if (__has_rvv_via_hwcap()) {
 		__memset_ptr = __memset_vect;
 		__memcpy_ptr = __memcpy_vect;
